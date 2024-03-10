@@ -1,17 +1,17 @@
 #!/bin/bash
-VERSION=$(cat /endkind/folia_version)
-BASE_URL="https://api.papermc.io/v2/projects/folia"
 
-if [ $VERSION == "latest" ]; then
-    VERSION=$(curl -s "$BASE_URL" | jq -r '.versions | .[-1]')
-fi
+PROJECT="folia"
+MINECRAFT_VERSION="1.20.4"
 
-LATEST_BUILD=$(curl -s "$BASE_URL/versions/$VERSION" | jq -r '.builds | .[-1]')
+LATEST_VERSION=$(curl -s https://api.papermc.io/v2/projects/${PROJECT} | \
+    jq -r '.versions[-1]')
 
-curl -o "/endkind/server.jar" -L "$BASE_URL/versions/$VERSION/builds/$LATEST_BUILD/downloads/folia-$VERSION-$LATEST_BUILD.jar"
-if [ $? -eq 0 ]; then
-    echo "Download Volia Version ($VERSION) Build ($LATEST_BUILD)"
-else
-    echo "An error occurred while downloading Folia. Please try again or recreate the container."
-    exit 1
-fi
+LATEST_BUILD=$(curl -s https://api.papermc.io/v2/projects/${PROJECT}/versions/${MINECRAFT_VERSION}/builds | \
+    jq -r '.builds | map(select(.channel == "experimental") | .build) | .[-1]')
+
+JAR_NAME=${PROJECT}-${LATEST_VERSION}-${LATEST_BUILD}.jar
+
+PAPERMC_URL="https://api.papermc.io/v2/projects/${PROJECT}/versions/${LATEST_VERSION}/builds/${LATEST_BUILD}/downloads/${JAR_NAME}"
+
+curl -o server.jar $PAPERMC_URL
+echo "Downloads completed"
