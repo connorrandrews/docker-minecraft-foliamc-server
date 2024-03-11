@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jre AS build
 RUN apt-get update -y && apt-get install -y curl jq
 
 LABEL Marc Tönsing <marc@marc.tv>
-
+LABEL Connor Andrews <https://github.com/connorrandrews/>
 
 
 ########################################################
